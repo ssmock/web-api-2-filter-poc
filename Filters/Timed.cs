@@ -6,17 +6,15 @@ using System.Threading;
 using System.Web;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
+using web_api_2_filter_poc.Logic;
 
 namespace web_api_2_filter_poc.Filters
 {
     /// <summary>
     /// Provides synchronous logging of the elapsed time from OnActionExecting
-    /// to OnActionExecuted by extending LoggingFilter.
+    /// to OnActionExecuted.
     /// </summary>
     /// <remarks>
-    /// While this implementation inherits from a simple debug logger, we could
-    /// easily pass down another kind (e.g. database) logger as a dependency.
-    /// 
     /// One nice thing about our simple logger is: it captures the controller
     /// and action names.
     /// 
@@ -25,18 +23,25 @@ namespace web_api_2_filter_poc.Filters
     /// overrides!  This will result in both of them being called, and elapsed
     /// times being double-logged.)
     /// </remarks>
-    public class Timed: LoggingFilter
+    public class Timed : ActionFilterAttribute
     {
         private const string TIMED_PROPERTY_KEY = "Filters::Timed";
         private const string TIMED_KEY_FORMAT = "Filters::Timed::ID={0}";
         private const string TIMED_LOG_DESCRIPTION_FORMAT = "Elapsed: {0}";
 
         private Dictionary<string, Stopwatch> stopwatches;
-        object dictionaryLocker = new object();
+        private object dictionaryLocker = new object();
+        private ILogger logger;
 
-        public Timed() : base()
+        public Timed(Type loggerType) : base()
         {
+            if (!loggerType.GetInterfaces().Contains(typeof(ILogger)))
+                throw new TypeLoadException(
+                    string.Format("Type {0} does not implement ILogger.",
+                        loggerType.Name));
+
             stopwatches = new Dictionary<string, Stopwatch>();
+            logger = (ILogger)Activator.CreateInstance(loggerType);
         }
 
         public override void OnActionExecuting(HttpActionContext actionContext)
@@ -80,7 +85,7 @@ namespace web_api_2_filter_poc.Filters
 
             stopwatches.Remove(timerKey);
 
-            Log(actionContext, GetTimerDescription(timer));
+            logger.Log(actionContext, GetTimerDescription(timer));
         }
 
         private void StartTiming(HttpActionContext actionContext)

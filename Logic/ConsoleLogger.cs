@@ -1,21 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Web;
 using System.Web.Http.Controllers;
-using System.Web.Http.Filters;
+using System.Diagnostics;
 
-namespace web_api_2_filter_poc.Filters
+namespace web_api_2_filter_poc.Logic
 {
-    public class LoggingFilter: ActionFilterAttribute
+    public class ConsoleLogger : ILogger
     {
-        public LoggingFilter() : base()
+        public void Log(string message)
         {
-            // Nothing
+            Debug.WriteLine(message);
         }
 
-        protected void Log(HttpActionContext context, string description)
+
+        public void Log(HttpActionContext context, string description)
         {
             Debug.WriteLine("{0} - {1}.{2} - {3}",
                    this.GetType().Name,

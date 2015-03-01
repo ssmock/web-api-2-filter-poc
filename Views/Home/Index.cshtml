@@ -11,7 +11,7 @@
     <script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
     <script>
         function postIt(url, data) {
-            $.ajax(url, {
+            return $.ajax(url, {
                 type: "POST",
                 data: data,
                 success: function () {
@@ -23,10 +23,15 @@
             });
         }
 
-        postIt("../api/values/timed", { SleepTimeMs: 500 });
-        postIt("../api/values/timed", { SleepTimeMs: 2000 });
-        postIt("../api/values/timed", { SleepTimeMs: 0 });
-        
+        $.when(
+            postIt("../api/values/timed", { SleepTimeMs: 500 }),
+            postIt("../api/values/timed", { SleepTimeMs: 2000 }),
+            postIt("../api/values/timed", { SleepTimeMs: 0 })).then(requestAnError);
+
+        function requestAnError() {
+            postIt("../api/values/always-throws", {});
+        }
+
         console.log("Loaded");
     </script>
 </body>

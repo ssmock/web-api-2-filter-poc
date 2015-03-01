@@ -107,11 +107,14 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ValuesController.cs" />
-    <Compile Include="Filters\LoggingFilter.cs" />
+    <Compile Include="Filters\LogAction.cs" />
+    <Compile Include="Filters\LogError.cs" />
     <Compile Include="Filters\Timed.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Logic\ConsoleLogger.cs" />
+    <Compile Include="Logic\ILogger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
